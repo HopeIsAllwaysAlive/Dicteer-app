@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dicteer">
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="manifest.json">
     <title>Dicteer App</title>
     <style>
         * {
@@ -480,6 +485,15 @@
         editNoteBtn.addEventListener('click', () => shareWithGemini('editNote'));
         newListBtn.addEventListener('click', () => shareWithGemini('newList'));
         editListBtn.addEventListener('click', () => shareWithGemini('editList'));
+        
+        // Service Worker registratie voor PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker geregistreerd'))
+                    .catch(err => console.log('Service Worker registratie mislukt:', err));
+            });
+        }
     </script>
 </body>
 </html>
