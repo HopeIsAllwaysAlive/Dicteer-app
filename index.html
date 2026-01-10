@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicteer App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        #startBtn {
+            background: #667eea;
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        #startBtn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        #startBtn.listening {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        #clearBtn, #copyBtn {
+            background: #ecf0f1;
+            color: #333;
+        }
+        
+        #clearBtn:hover, #copyBtn:hover {
+            background: #d5dbdb;
+        }
+        
+        .share-controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .share-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 12px;
+        }
+        
+        .share-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .language-selector {
+            margin-bottom: 20px;
+        }
+        
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ecf0f1;
+            font-size: 14px;
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .status.listening {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Dicteer App</h1>
+        <p class="subtitle">Spreek duidelijk in je microfoon</p>
+        
+        <div class="language-selector">
+            <label for="language">Taal:</label>
+            <select id="language">
+                <option value="nl-NL">Nederlands</option>
+                <option value="en-US">Engels (VS)</option>
+                <option value="en-GB">Engels (UK)</option>
+                <option value="de-DE">Duits</option>
+                <option value="fr-FR">Frans</option>
+                <option value="es-ES">Spaans</option>
+            </select>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn">Start Opname</button>
+            <button id="clearBtn">Wissen</button>
+            <button id="copyBtn">Kopiëren</button>
+        </div>
+        
+        <div class="share-controls">
+            <p class="share-title">Delen met Gemini:</p>
+            <button id="calendarBtn" class="share-btn">📅 Agenda</button>
+            <button id="taskBtn" class="share-btn">✅ Taak</button>
+            <button id="noteBtn" class="share-btn">📝 Notitie</button>
+        </div>
+        
+        <textarea id="textArea" placeholder="Je getypte tekst verschijnt hier..."></textarea>
+        
+        <div id="status" class="status hidden"></div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const calendarBtn = document.getElementById('calendarBtn');
+        const taskBtn = document.getElementById('taskBtn');
+        const noteBtn = document.getElementById('noteBtn');
+        const textArea = document.getElementById('textArea');
+        const statusDiv = document.getElementById('status');
+        const languageSelect = document.getElementById('language');
+        
+        let recognition;
+        let isListening = false;
+
+        // Check of browser spraakherkenning ondersteunt
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            showStatus('Je browser ondersteunt geen spraakherkenning. Probeer Chrome of Edge.', 'error');
+            startBtn.disabled = true;
+        } else {
+            // Initialiseer spraakherkenning
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = languageSelect.value;
+            
+            // Update taal bij wijziging
+            languageSelect.addEventListener('change', () => {
+                recognition.lang = languageSelect.value;
+                if (isListening) {
+                    recognition.stop();
+                    setTimeout(() => recognition.start(), 100);
+                }
+            });
+            
+            let lastSegmentTime = Date.now();
+            
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                if (finalTranscript) {
+                    const now = Date.now();
+                    const timeSinceLastSegment = now - lastSegmentTime;
+                    lastSegmentTime = now;
+                    
+                    // Voeg leestekens toe
+                    let processed = finalTranscript.trim();
+                    
+                    // Maak eerste letter hoofdletter als tekstveld leeg is of na punt
+                    const currentText = textArea.value.trim();
+                    if (currentText === '' || currentText.endsWith('.') || currentText.endsWith('?') || currentText.endsWith('!')) {
+                        processed = processed.charAt(0).toUpperCase() + processed.slice(1);
+                    }
+                    
+                    // Voeg punt toe aan het einde als er een pauze van meer dan 2 seconden was
+                    if (timeSinceLastSegment > 2000 && currentText !== '') {
+                        // Voeg punt toe aan vorige tekst als die nog geen leesteken heeft
+                        const lastChar = currentText.slice(-1);
+                        if (lastChar !== '.' && lastChar !== '?' && lastChar !== '!' && lastChar !== ',') {
+                            textArea.value = currentText + '. ';
+                        }
+                        processed = processed.charAt(0).toUpperCase() + processed.slice(1);
+                    }
+                    
+                    textArea.value += processed + ' ';
+                }
+            };
+            
+            recognition.onstart = () => {
+                isListening = true;
+                startBtn.textContent = 'Stop Opname';
+                startBtn.classList.add('listening');
+                showStatus('Luisteren... Spreek nu!', 'listening');
+            };
+            
+            recognition.onend = () => {
+                isListening = false;
+                startBtn.textContent = 'Start Opname';
+                startBtn.classList.remove('listening');
+                
+                // Voeg punt toe aan het einde als tekst niet eindigt met leesteken
+                const text = textArea.value.trim();
+                if (text !== '') {
+                    const lastChar = text.slice(-1);
+                    if (lastChar !== '.' && lastChar !== '?' && lastChar !== '!' && lastChar !== ',') {
+                        textArea.value = text + '.\n\n';
+                    } else {
+                        textArea.value = text + '\n\n';
+                    }
+                }
+                
+                if (statusDiv.textContent.includes('Luisteren')) {
+                    hideStatus();
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                if (event.error === 'no-speech') {
+                    showStatus('Geen spraak gedetecteerd. Probeer het opnieuw.', 'error');
+                } else if (event.error === 'not-allowed') {
+                    showStatus('Microfoon toegang geweigerd. Geef toestemming in je browser.', 'error');
+                } else {
+                    showStatus('Fout: ' + event.error, 'error');
+                }
+            };
+        }
+        
+        startBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            textArea.value = '';
+            showStatus('Tekst gewist', 'info');
+            setTimeout(hideStatus, 2000);
+        });
+        
+        copyBtn.addEventListener('click', () => {
+            textArea.select();
+            document.execCommand('copy');
+            showStatus('Tekst gekopieerd naar klembord!', 'info');
+            setTimeout(hideStatus, 2000);
+        });
+        
+        // Functie om te delen met Gemini prompt
+        async function shareWithGemini(promptType) {
+            const text = textArea.value.trim();
+            
+            if (!text) {
+                showStatus('Geen tekst om te delen', 'error');
+                setTimeout(hideStatus, 2000);
+                return;
+            }
+            
+            let prompt = '';
+            
+            if (promptType === 'calendar') {
+                prompt = `Controleer eerst mijn Google Agenda op bestaande afspraken die overeenkomen met de kerngegevens in de volgende tekst.
+1. Als de tekst een wijziging of verplaatsing is van een bestaande afspraak (bijv. een andere tijd, datum of locatie), pas de bestaande afspraak dan aan.
+2. Als de tekst informatie bevat die een aanvulling is op een bestaande afspraak (details voor de beschrijving), voeg dit dan toe.
+3. Als er geen overeenkomstige afspraak wordt gevonden, maak dan een nieuw agenda-item aan. Gebruik de datum en tijd uit de tekst; als deze ontbreken, vraag er dan naar.
+
+De tekst is: ${text}`;
+            } else if (promptType === 'task') {
+                prompt = `Zoek in mijn openstaande Google Tasks naar een taak die inhoudelijk overeenkomt met de volgende tekst. Als er een bestaande taak is waar dit logisch onder valt, voeg de tekst dan toe als een nieuwe subtaak (of als toevoeging in de beschrijving) van die taak. Als er geen relevante taak bestaat, maak dan een nieuwe hoofdtaak aan op basis van de tekst.
+
+De tekst is: ${text}`;
+            } else if (promptType === 'note') {
+                prompt = `Doorzoek mijn Google Keep-notities en lijsten naar een item dat inhoudelijk overeenkomt met de volgende tekst.
+1. Als de tekst een kort item is (zoals een boodschap of actiepunt) en er bestaat al een relevante LIJST (bijv. 'Boodschappen' of 'To-do'), voeg het item dan toe aan die lijst.
+2. Als er een relevante TEKSTNOTITIE bestaat over dit onderwerp, voeg de nieuwe informatie dan toe onderaan de bestaande tekst.
+3. Als er geen enkele match is, maak dan een nieuwe notitie aan (of een lijst als de tekst meerdere items bevat).
+Gebruik logica om de juiste notitie te vinden.
+
+De tekst is: ${text}`;
+            }
+            
+            // Check of browser Web Share API ondersteunt
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Voor Gemini',
+                        text: prompt
+                    });
+                    showStatus('Gedeeld! Kies Gemini uit het menu', 'info');
+                    setTimeout(hideStatus, 3000);
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        // Fallback: kopieer naar klembord
+                        navigator.clipboard.writeText(prompt).then(() => {
+                            showStatus('Prompt gekopieerd! Plak in Gemini', 'info');
+                            setTimeout(hideStatus, 3000);
+                        });
+                    }
+                }
+            } else {
+                // Fallback voor browsers zonder share API
+                navigator.clipboard.writeText(prompt).then(() => {
+                    showStatus('Prompt gekopieerd! Plak in Gemini', 'info');
+                    setTimeout(hideStatus, 3000);
+                });
+            }
+        }
+        
+        calendarBtn.addEventListener('click', () => shareWithGemini('calendar'));
+        taskBtn.addEventListener('click', () => shareWithGemini('task'));
+        noteBtn.addEventListener('click', () => shareWithGemini('note'));
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.classList.remove('hidden');
+        }
+        
+        function hideStatus() {
+            statusDiv.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
