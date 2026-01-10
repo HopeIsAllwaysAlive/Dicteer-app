@@ -81,12 +81,12 @@
             50% { opacity: 0.7; }
         }
         
-        #clearBtn, #copyBtn {
+        #clearBtn, #copyBtn, #shareBtn {
             background: #ecf0f1;
             color: #333;
         }
         
-        #clearBtn:hover, #copyBtn:hover {
+        #clearBtn:hover, #copyBtn:hover, #shareBtn:hover {
             background: #d5dbdb;
         }
         
@@ -169,6 +169,7 @@
             <button id="startBtn">Start Opname</button>
             <button id="clearBtn">Wissen</button>
             <button id="copyBtn">Kopiëren</button>
+            <button id="shareBtn">Delen</button>
         </div>
         
         <textarea id="textArea" placeholder="Je getypte tekst verschijnt hier..."></textarea>
@@ -180,6 +181,7 @@
         const startBtn = document.getElementById('startBtn');
         const clearBtn = document.getElementById('clearBtn');
         const copyBtn = document.getElementById('copyBtn');
+        const shareBtn = document.getElementById('shareBtn');
         const textArea = document.getElementById('textArea');
         const statusDiv = document.getElementById('status');
         const languageSelect = document.getElementById('language');
@@ -312,6 +314,40 @@
             document.execCommand('copy');
             showStatus('Tekst gekopieerd naar klembord!', 'info');
             setTimeout(hideStatus, 2000);
+        });
+        
+        shareBtn.addEventListener('click', async () => {
+            const text = textArea.value.trim();
+            
+            if (!text) {
+                showStatus('Geen tekst om te delen', 'error');
+                setTimeout(hideStatus, 2000);
+                return;
+            }
+            
+            // Check of browser Web Share API ondersteunt
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Gedicteerde notitie',
+                        text: text
+                    });
+                    showStatus('Gedeeld!', 'info');
+                    setTimeout(hideStatus, 2000);
+                } catch (err) {
+                    // Gebruiker heeft geannuleerd of fout opgetreden
+                    if (err.name !== 'AbortError') {
+                        showStatus('Delen mislukt', 'error');
+                        setTimeout(hideStatus, 2000);
+                    }
+                }
+            } else {
+                // Fallback voor browsers zonder share API
+                textArea.select();
+                document.execCommand('copy');
+                showStatus('Je browser ondersteunt delen niet. Tekst gekopieerd!', 'info');
+                setTimeout(hideStatus, 3000);
+            }
         });
         
         function showStatus(message, type) {
