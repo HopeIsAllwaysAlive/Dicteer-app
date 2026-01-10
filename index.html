@@ -81,13 +81,48 @@
             50% { opacity: 0.7; }
         }
         
-        #clearBtn, #copyBtn, #shareBtn {
+        #clearBtn, #copyBtn {
             background: #ecf0f1;
             color: #333;
         }
         
-        #clearBtn:hover, #copyBtn:hover, #shareBtn:hover {
+        #clearBtn:hover, #copyBtn:hover {
             background: #d5dbdb;
+        }
+        
+        .share-controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .share-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 12px;
+        }
+        
+        .share-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea;
         }
         
         .language-selector {
@@ -169,7 +204,13 @@
             <button id="startBtn">Start Opname</button>
             <button id="clearBtn">Wissen</button>
             <button id="copyBtn">Kopiëren</button>
-            <button id="shareBtn">Delen</button>
+        </div>
+        
+        <div class="share-controls">
+            <p class="share-title">Delen met Gemini:</p>
+            <button id="calendarBtn" class="share-btn">📅 Agenda</button>
+            <button id="taskBtn" class="share-btn">✅ Taak</button>
+            <button id="noteBtn" class="share-btn">📝 Notitie</button>
         </div>
         
         <textarea id="textArea" placeholder="Je getypte tekst verschijnt hier..."></textarea>
@@ -181,7 +222,9 @@
         const startBtn = document.getElementById('startBtn');
         const clearBtn = document.getElementById('clearBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const shareBtn = document.getElementById('shareBtn');
+        const calendarBtn = document.getElementById('calendarBtn');
+        const taskBtn = document.getElementById('taskBtn');
+        const noteBtn = document.getElementById('noteBtn');
         const textArea = document.getElementById('textArea');
         const statusDiv = document.getElementById('status');
         const languageSelect = document.getElementById('language');
@@ -316,7 +359,8 @@
             setTimeout(hideStatus, 2000);
         });
         
-        shareBtn.addEventListener('click', async () => {
+        // Functie om te delen met Gemini prompt
+        async function shareWithGemini(promptType) {
             const text = textArea.value.trim();
             
             if (!text) {
@@ -325,30 +369,46 @@
                 return;
             }
             
+            let prompt = '';
+            
+            if (promptType === 'calendar') {
+                prompt = `Maak een agenda-item aan in Google Calendar op basis van deze tekst. Haal de datum, tijd en omschrijving eruit:\n\n${text}`;
+            } else if (promptType === 'task') {
+                prompt = `Maak een taak aan in Google Tasks op basis van deze tekst. Haal de taakomschrijving eruit. Als het een subtaak is van een andere taak, haal dat er dan ook uit:\n\n${text}`;
+            } else if (promptType === 'note') {
+                prompt = `Maak een notitie aan in Google Keep met deze tekst:\n\n${text}`;
+            }
+            
             // Check of browser Web Share API ondersteunt
             if (navigator.share) {
                 try {
                     await navigator.share({
-                        title: 'Gedicteerde notitie',
-                        text: text
+                        title: 'Voor Gemini',
+                        text: prompt
                     });
-                    showStatus('Gedeeld!', 'info');
-                    setTimeout(hideStatus, 2000);
+                    showStatus('Gedeeld! Kies Gemini uit het menu', 'info');
+                    setTimeout(hideStatus, 3000);
                 } catch (err) {
-                    // Gebruiker heeft geannuleerd of fout opgetreden
                     if (err.name !== 'AbortError') {
-                        showStatus('Delen mislukt', 'error');
-                        setTimeout(hideStatus, 2000);
+                        // Fallback: kopieer naar klembord
+                        navigator.clipboard.writeText(prompt).then(() => {
+                            showStatus('Prompt gekopieerd! Plak in Gemini', 'info');
+                            setTimeout(hideStatus, 3000);
+                        });
                     }
                 }
             } else {
                 // Fallback voor browsers zonder share API
-                textArea.select();
-                document.execCommand('copy');
-                showStatus('Je browser ondersteunt delen niet. Tekst gekopieerd!', 'info');
-                setTimeout(hideStatus, 3000);
+                navigator.clipboard.writeText(prompt).then(() => {
+                    showStatus('Prompt gekopieerd! Plak in Gemini', 'info');
+                    setTimeout(hideStatus, 3000);
+                });
             }
-        });
+        }
+        
+        calendarBtn.addEventListener('click', () => shareWithGemini('calendar'));
+        taskBtn.addEventListener('click', () => shareWithGemini('task'));
+        noteBtn.addEventListener('click', () => shareWithGemini('note'));
         
         function showStatus(message, type) {
             statusDiv.textContent = message;
