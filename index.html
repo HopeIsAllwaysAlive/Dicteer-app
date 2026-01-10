@@ -411,13 +411,13 @@
             
             // Google Calendar prompts
             if (actionType === 'newCalendar') {
-                prompt = `Maak een NIEUWE afspraak aan in Google Calendar op basis van deze tekst. Haal de datum, tijd en omschrijving eruit. Als datum of tijd ontbreken, vraag er dan naar.
+                prompt = `@Google Calendar Maak een NIEUWE afspraak aan in Google Calendar op basis van deze tekst. Haal de datum, tijd en omschrijving eruit. Als datum of tijd ontbreken, vraag er dan naar.
 
 De tekst is: ${text}
 
 BELANGRIJK: Voer dit daadwerkelijk uit in Google Calendar en bevestig dat de afspraak is toegevoegd.`;
             } else if (actionType === 'editCalendar') {
-                prompt = `Zoek een BESTAANDE afspraak in Google Calendar die overeenkomt met deze tekst en wijzig deze. Pas de tijd, datum, locatie of beschrijving aan zoals aangegeven in de tekst.
+                prompt = `@Google Calendar Zoek een BESTAANDE afspraak in Google Calendar die overeenkomt met deze tekst en wijzig deze. Pas de tijd, datum, locatie of beschrijving aan zoals aangegeven in de tekst.
 
 De tekst is: ${text}
 
@@ -426,13 +426,13 @@ BELANGRIJK: Voer de wijziging daadwerkelijk uit in Google Calendar en bevestig d
             
             // Google Tasks prompts
             else if (actionType === 'newTask') {
-                prompt = `Maak een NIEUWE hoofdtaak aan in Google Tasks op basis van deze tekst.
+                prompt = `@Google Tasks Maak een NIEUWE hoofdtaak aan in Google Tasks op basis van deze tekst.
 
 De tekst is: ${text}
 
 BELANGRIJK: Voer dit daadwerkelijk uit in Google Tasks en bevestig dat de taak is toegevoegd.`;
             } else if (actionType === 'editTask') {
-                prompt = `Zoek een BESTAANDE taak in Google Tasks die overeenkomt met deze tekst en voeg dit toe als een subtaak of pas de beschrijving aan.
+                prompt = `@Google Tasks Zoek een BESTAANDE taak in Google Tasks die overeenkomt met deze tekst en voeg dit toe als een subtaak of pas de beschrijving aan.
 
 De tekst is: ${text}
 
@@ -441,25 +441,25 @@ BELANGRIJK: Voer de wijziging daadwerkelijk uit in Google Tasks en bevestig dat 
             
             // Google Keep prompts
             else if (actionType === 'newNote') {
-                prompt = `Maak een NIEUWE tekstnotitie aan in Google Keep met deze tekst.
+                prompt = `@Google Keep Maak een NIEUWE tekstnotitie aan in Google Keep met deze tekst.
 
 De tekst is: ${text}
 
 BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de notitie is aangemaakt.`;
             } else if (actionType === 'editNote') {
-                prompt = `Zoek een BESTAANDE tekstnotitie in Google Keep die overeenkomt met deze tekst en voeg de nieuwe informatie toe onderaan de bestaande tekst.
+                prompt = `@Google Keep Zoek een BESTAANDE tekstnotitie in Google Keep die overeenkomt met deze tekst en voeg de nieuwe informatie toe onderaan de bestaande tekst.
 
 De tekst is: ${text}
 
 BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de notitie is aangevuld.`;
             } else if (actionType === 'newList') {
-                prompt = `Maak een NIEUWE LIJST aan in Google Keep op basis van deze tekst. Als de tekst meerdere items bevat, maak daar een checklist van.
+                prompt = `@Google Keep Maak een NIEUWE LIJST aan in Google Keep op basis van deze tekst. Als de tekst meerdere items bevat, maak daar een checklist van.
 
 De tekst is: ${text}
 
 BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de lijst is aangemaakt.`;
             } else if (actionType === 'editList') {
-                prompt = `Zoek een BESTAANDE LIJST in Google Keep die overeenkomt met deze tekst en voeg het nieuwe item toe aan die lijst.
+                prompt = `@Google Keep Zoek een BESTAANDE LIJST in Google Keep die overeenkomt met deze tekst en voeg het nieuwe item toe aan die lijst.
 
 De tekst is: ${text}
 
