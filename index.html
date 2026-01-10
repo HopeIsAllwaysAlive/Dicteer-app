@@ -98,22 +98,41 @@
         }
         
         .share-title {
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+        }
+        
+        .share-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .share-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .share-subtitle {
+            font-size: 13px;
             font-weight: 600;
             color: #555;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         
         .share-btn {
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 600;
-            margin-right: 8px;
-            margin-bottom: 8px;
+            margin-right: 6px;
+            margin-bottom: 6px;
             background: white;
             color: #333;
             border: 2px solid #e0e0e0;
@@ -208,9 +227,23 @@
         
         <div class="share-controls">
             <p class="share-title">Delen met Gemini:</p>
-            <button id="calendarBtn" class="share-btn">📅 Agenda</button>
-            <button id="taskBtn" class="share-btn">✅ Taak</button>
-            <button id="noteBtn" class="share-btn">📝 Notitie</button>
+            <div class="share-section">
+                <p class="share-subtitle">📅 Google Agenda</p>
+                <button id="newCalendarBtn" class="share-btn">Nieuwe afspraak</button>
+                <button id="editCalendarBtn" class="share-btn">Afspraak wijzigen</button>
+            </div>
+            <div class="share-section">
+                <p class="share-subtitle">✅ Google Tasks</p>
+                <button id="newTaskBtn" class="share-btn">Nieuwe taak</button>
+                <button id="editTaskBtn" class="share-btn">Taak wijzigen</button>
+            </div>
+            <div class="share-section">
+                <p class="share-subtitle">📝 Google Keep</p>
+                <button id="newNoteBtn" class="share-btn">Nieuwe notitie</button>
+                <button id="editNoteBtn" class="share-btn">Notitie aanvullen</button>
+                <button id="newListBtn" class="share-btn">Lijstje maken</button>
+                <button id="editListBtn" class="share-btn">Lijstje aanvullen</button>
+            </div>
         </div>
         
         <textarea id="textArea" placeholder="Je getypte tekst verschijnt hier..."></textarea>
@@ -222,9 +255,14 @@
         const startBtn = document.getElementById('startBtn');
         const clearBtn = document.getElementById('clearBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const calendarBtn = document.getElementById('calendarBtn');
-        const taskBtn = document.getElementById('taskBtn');
-        const noteBtn = document.getElementById('noteBtn');
+        const newCalendarBtn = document.getElementById('newCalendarBtn');
+        const editCalendarBtn = document.getElementById('editCalendarBtn');
+        const newTaskBtn = document.getElementById('newTaskBtn');
+        const editTaskBtn = document.getElementById('editTaskBtn');
+        const newNoteBtn = document.getElementById('newNoteBtn');
+        const editNoteBtn = document.getElementById('editNoteBtn');
+        const newListBtn = document.getElementById('newListBtn');
+        const editListBtn = document.getElementById('editListBtn');
         const textArea = document.getElementById('textArea');
         const statusDiv = document.getElementById('status');
         const languageSelect = document.getElementById('language');
@@ -377,9 +415,9 @@
 2. Als de tekst informatie bevat die een aanvulling is op een bestaande afspraak (details voor de beschrijving), voeg dit dan toe.
 3. Als er geen overeenkomstige afspraak wordt gevonden, maak dan een nieuw agenda-item aan. Gebruik de datum en tijd uit de tekst; als deze ontbreken, vraag er dan naar.
 
-De tekst is: ${text}
+BELANGRIJK: Voer de actie daadwerkelijk uit in Google Calendar. Controleer na het toevoegen of wijzigen of het item echt in de agenda staat en bevestig dit met een screenshot of duidelijke bevestiging.
 
-BELANGRIJK: Voer de actie daadwerkelijk uit in Google Calendar. Controleer na het toevoegen of wijzigen of het item echt in de agenda staat en bevestig dit met een screenshot of duidelijke bevestiging.`;
+De tekst is: ${text}`;
             } else if (promptType === 'task') {
                 prompt = `Zoek in mijn openstaande Google Tasks naar een taak die inhoudelijk overeenkomt met de volgende tekst. Als er een bestaande taak is waar dit logisch onder valt, voeg de tekst dan toe als een nieuwe subtaak (of als toevoeging in de beschrijving) van die taak. Als er geen relevante taak bestaat, maak dan een nieuwe hoofdtaak aan op basis van de tekst.
 
