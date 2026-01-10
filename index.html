@@ -411,59 +411,27 @@
             
             // Google Calendar prompts
             if (actionType === 'newCalendar') {
-                prompt = `@Google Calendar Maak een NIEUWE afspraak aan in Google Calendar op basis van deze tekst. Haal de datum, tijd en omschrijving eruit. Als datum of tijd ontbreken, vraag er dan naar.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer dit daadwerkelijk uit in Google Calendar en bevestig dat de afspraak is toegevoegd.`;
+                prompt = `Hi Gemini, ik wil een nieuwe afspraak maken in mijn Google Agenda: ${text}`;
             } else if (actionType === 'editCalendar') {
-                prompt = `@Google Calendar Zoek een BESTAANDE afspraak in Google Calendar die overeenkomt met deze tekst en wijzig deze. Pas de tijd, datum, locatie of beschrijving aan zoals aangegeven in de tekst.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer de wijziging daadwerkelijk uit in Google Calendar en bevestig dat de afspraak is aangepast.`;
+                prompt = `Hi Gemini, ik wil een bestaande afspraak wijzigen in mijn Google Agenda: ${text}`;
             }
             
             // Google Tasks prompts
             else if (actionType === 'newTask') {
-                prompt = `@Google Tasks Maak een NIEUWE hoofdtaak aan in Google Tasks op basis van deze tekst.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer dit daadwerkelijk uit in Google Tasks en bevestig dat de taak is toegevoegd.`;
+                prompt = `Hi Gemini, ik wil een nieuwe taak aanmaken in mijn Google Tasks: ${text}`;
             } else if (actionType === 'editTask') {
-                prompt = `@Google Tasks Zoek een BESTAANDE taak in Google Tasks die overeenkomt met deze tekst en voeg dit toe als een subtaak of pas de beschrijving aan.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer de wijziging daadwerkelijk uit in Google Tasks en bevestig dat de taak is aangepast.`;
+                prompt = `Hi Gemini, ik wil een bestaande taak aanvullen in mijn Google Tasks: ${text}`;
             }
             
             // Google Keep prompts
             else if (actionType === 'newNote') {
-                prompt = `@Google Keep Maak een NIEUWE tekstnotitie aan in Google Keep met deze tekst.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de notitie is aangemaakt.`;
+                prompt = `Hi Gemini, ik wil een nieuwe notitie maken in mijn Google Keep: ${text}`;
             } else if (actionType === 'editNote') {
-                prompt = `@Google Keep Zoek een BESTAANDE tekstnotitie in Google Keep die overeenkomt met deze tekst en voeg de nieuwe informatie toe onderaan de bestaande tekst.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de notitie is aangevuld.`;
+                prompt = `Hi Gemini, ik wil een bestaande notitie aanvullen in mijn Google Keep: ${text}`;
             } else if (actionType === 'newList') {
-                prompt = `@Google Keep Maak een NIEUWE LIJST aan in Google Keep op basis van deze tekst. Als de tekst meerdere items bevat, maak daar een checklist van.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de lijst is aangemaakt.`;
+                prompt = `Hi Gemini, ik wil een nieuwe lijst maken in mijn Google Keep: ${text}`;
             } else if (actionType === 'editList') {
-                prompt = `@Google Keep Zoek een BESTAANDE LIJST in Google Keep die overeenkomt met deze tekst en voeg het nieuwe item toe aan die lijst.
-
-De tekst is: ${text}
-
-BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat het item is toegevoegd aan de lijst.`;
+                prompt = `Hi Gemini, ik wil een item toevoegen aan een bestaande lijst in mijn Google Keep: ${text}`;
             }
             
             // Check of browser Web Share API ondersteunt
