@@ -420,12 +420,12 @@
             else if (actionType === 'newTask') {
                 prompt = `Hi Gemini, ik wil een nieuwe taak aanmaken in mijn Google Tasks: ${text}`;
             } else if (actionType === 'editTask') {
-                prompt = `Hi Gemini, ik wil een bestaande taak aanvullen in mijn Google Tasks: ${text}`;
+                prompt = `Hi Gemini, ik wil iets toevoegen aan een bestaande taak in mijn Google Tasks: ${text}`;
             }
             
             // Google Keep prompts
             else if (actionType === 'newNote') {
-                prompt = `Hi Gemini, ik wil een nieuwe notitie maken in mijn Google Keep: ${text}`;
+                prompt = `Hi Gemini, ik wil een nieuwe notitie maken in mijn Google Keep, bedenk zelf maar een titel, de inhoud van de notitie is: ${text}`;
             } else if (actionType === 'editNote') {
                 prompt = `Hi Gemini, ik wil een bestaande notitie aanvullen in mijn Google Keep: ${text}`;
             } else if (actionType === 'newList') {
