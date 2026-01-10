@@ -377,9 +377,13 @@
 2. Als de tekst informatie bevat die een aanvulling is op een bestaande afspraak (details voor de beschrijving), voeg dit dan toe.
 3. Als er geen overeenkomstige afspraak wordt gevonden, maak dan een nieuw agenda-item aan. Gebruik de datum en tijd uit de tekst; als deze ontbreken, vraag er dan naar.
 
+BELANGRIJK: Voer de actie daadwerkelijk uit in Google Calendar. Controleer na het toevoegen of wijzigen of het item echt in de agenda staat en bevestig dit met een screenshot of duidelijke bevestiging.
+
 De tekst is: ${text}`;
             } else if (promptType === 'task') {
                 prompt = `Zoek in mijn openstaande Google Tasks naar een taak die inhoudelijk overeenkomt met de volgende tekst. Als er een bestaande taak is waar dit logisch onder valt, voeg de tekst dan toe als een nieuwe subtaak (of als toevoeging in de beschrijving) van die taak. Als er geen relevante taak bestaat, maak dan een nieuwe hoofdtaak aan op basis van de tekst.
+
+BELANGRIJK: Voer de actie daadwerkelijk uit in Google Tasks. Controleer na het toevoegen of de taak of subtaak echt is toegevoegd en bevestig dit.
 
 De tekst is: ${text}`;
             } else if (promptType === 'note') {
@@ -388,6 +392,8 @@ De tekst is: ${text}`;
 2. Als er een relevante TEKSTNOTITIE bestaat over dit onderwerp, voeg de nieuwe informatie dan toe onderaan de bestaande tekst.
 3. Als er geen enkele match is, maak dan een nieuwe notitie aan (of een lijst als de tekst meerdere items bevat).
 Gebruik logica om de juiste notitie te vinden.
+
+BELANGRIJK: Voer de actie daadwerkelijk uit in Google Keep. Controleer na het toevoegen of wijzigen of het item echt in Keep staat en bevestig dit.
 
 De tekst is: ${text}`;
             }
