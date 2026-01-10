@@ -90,60 +90,6 @@
             background: #d5dbdb;
         }
         
-        .share-controls {
-            margin-bottom: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
-        
-        .share-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 16px;
-        }
-        
-        .share-section {
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .share-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .share-subtitle {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 8px;
-        }
-        
-        .share-btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-            margin-right: 6px;
-            margin-bottom: 6px;
-            background: white;
-            color: #333;
-            border: 2px solid #e0e0e0;
-        }
-        
-        .share-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #667eea;
-        }
-        
         .language-selector {
             margin-bottom: 20px;
         }
@@ -199,6 +145,60 @@
         
         .hidden {
             display: none;
+        }
+        
+        .share-controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .share-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+        }
+        
+        .share-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .share-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .share-subtitle {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .share-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea;
         }
     </style>
 </head>
@@ -283,6 +283,8 @@
             recognition.interimResults = true;
             recognition.lang = languageSelect.value;
             
+            let lastSegmentTime = Date.now();
+            
             // Update taal bij wijziging
             languageSelect.addEventListener('change', () => {
                 recognition.lang = languageSelect.value;
@@ -291,8 +293,6 @@
                     setTimeout(() => recognition.start(), 100);
                 }
             });
-            
-            let lastSegmentTime = Date.now();
             
             recognition.onresult = (event) => {
                 let interimTranscript = '';
@@ -398,7 +398,7 @@
         });
         
         // Functie om te delen met Gemini prompt
-        async function shareWithGemini(promptType) {
+        async function shareWithGemini(actionType) {
             const text = textArea.value.trim();
             
             if (!text) {
@@ -409,31 +409,61 @@
             
             let prompt = '';
             
-            if (promptType === 'calendar') {
-                prompt = `Controleer eerst mijn Google Agenda op bestaande afspraken die overeenkomen met de kerngegevens in de volgende tekst.
-1. Als de tekst een wijziging of verplaatsing is van een bestaande afspraak (bijv. een andere tijd, datum of locatie), pas de bestaande afspraak dan aan.
-2. Als de tekst informatie bevat die een aanvulling is op een bestaande afspraak (details voor de beschrijving), voeg dit dan toe.
-3. Als er geen overeenkomstige afspraak wordt gevonden, maak dan een nieuw agenda-item aan. Gebruik de datum en tijd uit de tekst; als deze ontbreken, vraag er dan naar.
+            // Google Calendar prompts
+            if (actionType === 'newCalendar') {
+                prompt = `Maak een NIEUWE afspraak aan in Google Calendar op basis van deze tekst. Haal de datum, tijd en omschrijving eruit. Als datum of tijd ontbreken, vraag er dan naar.
 
-BELANGRIJK: Voer de actie daadwerkelijk uit in Google Calendar. Controleer na het toevoegen of wijzigen of het item echt in de agenda staat en bevestig dit met een screenshot of duidelijke bevestiging.
+De tekst is: ${text}
 
-De tekst is: ${text}`;
-            } else if (promptType === 'task') {
-                prompt = `Zoek in mijn openstaande Google Tasks naar een taak die inhoudelijk overeenkomt met de volgende tekst. Als er een bestaande taak is waar dit logisch onder valt, voeg de tekst dan toe als een nieuwe subtaak (of als toevoeging in de beschrijving) van die taak. Als er geen relevante taak bestaat, maak dan een nieuwe hoofdtaak aan op basis van de tekst.
+BELANGRIJK: Voer dit daadwerkelijk uit in Google Calendar en bevestig dat de afspraak is toegevoegd.`;
+            } else if (actionType === 'editCalendar') {
+                prompt = `Zoek een BESTAANDE afspraak in Google Calendar die overeenkomt met deze tekst en wijzig deze. Pas de tijd, datum, locatie of beschrijving aan zoals aangegeven in de tekst.
 
-BELANGRIJK: Voer de actie daadwerkelijk uit in Google Tasks. Controleer na het toevoegen of de taak of subtaak echt is toegevoegd en bevestig dit.
+De tekst is: ${text}
 
-De tekst is: ${text}`;
-            } else if (promptType === 'note') {
-                prompt = `Doorzoek mijn Google Keep-notities en lijsten naar een item dat inhoudelijk overeenkomt met de volgende tekst.
-1. Als de tekst een kort item is (zoals een boodschap of actiepunt) en er bestaat al een relevante LIJST (bijv. 'Boodschappen' of 'To-do'), voeg het item dan toe aan die lijst.
-2. Als er een relevante TEKSTNOTITIE bestaat over dit onderwerp, voeg de nieuwe informatie dan toe onderaan de bestaande tekst.
-3. Als er geen enkele match is, maak dan een nieuwe notitie aan (of een lijst als de tekst meerdere items bevat).
-Gebruik logica om de juiste notitie te vinden.
+BELANGRIJK: Voer de wijziging daadwerkelijk uit in Google Calendar en bevestig dat de afspraak is aangepast.`;
+            }
+            
+            // Google Tasks prompts
+            else if (actionType === 'newTask') {
+                prompt = `Maak een NIEUWE hoofdtaak aan in Google Tasks op basis van deze tekst.
 
-BELANGRIJK: Voer de actie daadwerkelijk uit in Google Keep. Controleer na het toevoegen of wijzigen of het item echt in Keep staat en bevestig dit.
+De tekst is: ${text}
 
-De tekst is: ${text}`;
+BELANGRIJK: Voer dit daadwerkelijk uit in Google Tasks en bevestig dat de taak is toegevoegd.`;
+            } else if (actionType === 'editTask') {
+                prompt = `Zoek een BESTAANDE taak in Google Tasks die overeenkomt met deze tekst en voeg dit toe als een subtaak of pas de beschrijving aan.
+
+De tekst is: ${text}
+
+BELANGRIJK: Voer de wijziging daadwerkelijk uit in Google Tasks en bevestig dat de taak is aangepast.`;
+            }
+            
+            // Google Keep prompts
+            else if (actionType === 'newNote') {
+                prompt = `Maak een NIEUWE tekstnotitie aan in Google Keep met deze tekst.
+
+De tekst is: ${text}
+
+BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de notitie is aangemaakt.`;
+            } else if (actionType === 'editNote') {
+                prompt = `Zoek een BESTAANDE tekstnotitie in Google Keep die overeenkomt met deze tekst en voeg de nieuwe informatie toe onderaan de bestaande tekst.
+
+De tekst is: ${text}
+
+BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de notitie is aangevuld.`;
+            } else if (actionType === 'newList') {
+                prompt = `Maak een NIEUWE LIJST aan in Google Keep op basis van deze tekst. Als de tekst meerdere items bevat, maak daar een checklist van.
+
+De tekst is: ${text}
+
+BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat de lijst is aangemaakt.`;
+            } else if (actionType === 'editList') {
+                prompt = `Zoek een BESTAANDE LIJST in Google Keep die overeenkomt met deze tekst en voeg het nieuwe item toe aan die lijst.
+
+De tekst is: ${text}
+
+BELANGRIJK: Voer dit daadwerkelijk uit in Google Keep en bevestig dat het item is toegevoegd aan de lijst.`;
             }
             
             // Check of browser Web Share API ondersteunt
@@ -463,10 +493,6 @@ De tekst is: ${text}`;
             }
         }
         
-        calendarBtn.addEventListener('click', () => shareWithGemini('calendar'));
-        taskBtn.addEventListener('click', () => shareWithGemini('task'));
-        noteBtn.addEventListener('click', () => shareWithGemini('note'));
-        
         function showStatus(message, type) {
             statusDiv.textContent = message;
             statusDiv.className = 'status ' + type;
@@ -476,6 +502,16 @@ De tekst is: ${text}`;
         function hideStatus() {
             statusDiv.classList.add('hidden');
         }
+        
+        // Event listeners voor alle knoppen
+        newCalendarBtn.addEventListener('click', () => shareWithGemini('newCalendar'));
+        editCalendarBtn.addEventListener('click', () => shareWithGemini('editCalendar'));
+        newTaskBtn.addEventListener('click', () => shareWithGemini('newTask'));
+        editTaskBtn.addEventListener('click', () => shareWithGemini('editTask'));
+        newNoteBtn.addEventListener('click', () => shareWithGemini('newNote'));
+        editNoteBtn.addEventListener('click', () => shareWithGemini('editNote'));
+        newListBtn.addEventListener('click', () => shareWithGemini('newList'));
+        editListBtn.addEventListener('click', () => shareWithGemini('editList'));
     </script>
 </body>
 </html>
