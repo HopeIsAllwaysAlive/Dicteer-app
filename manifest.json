@@ -2,7 +2,7 @@
   "name": "Dicteer App",
   "short_name": "Dicteer",
   "description": "Spraak naar tekst met Gemini integratie",
-  "start_url": "/",
+  "start_url": "/Dicteer-app/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
