@@ -544,17 +544,25 @@
                 showStatus('Gemini wordt geopend...', 'info');
             }
 
-            // Wacht even zodat gebruiker de status kan lezen
+            // Open direct of in een tabblad, AFHANKELIJK van het device.
+            // Op mobiel (iOS Safari) blokkeert een setTimeout vaak window.open (popup blocker).
+            // Daarom openen we de URL direct, en laten we de status timeout daarna pas afronden.
+            const encodedPrompt = encodeURIComponent(prompt);
+            const geminiUrl = `https://gemini.google.com/app?q=${encodedPrompt}`;
+
+            // Check of het een mobiel apparaat is (simpele check)
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Op mobiel: navigeer direct in hetzelfde tabblad. Voorkomt popup blockers en dwingt iOS om te vragen of de app open moet.
+                window.location.href = geminiUrl;
+            } else {
+                // Op desktop: open netjes in een nieuw tabblad
+                window.open(geminiUrl, '_blank');
+            }
+
+            // Wacht even zodat gebruiker de status in theorie nog kan lezen (op desktop)
             setTimeout(() => {
-                // Encode de prompt voor de URL
-                const encodedPrompt = encodeURIComponent(prompt);
-
-                // Open de Gemini URL. 
-                // Op iOS (mobiel) zal Safari vaak vragen "Openen in Gemini?" of direct de app openen
-                // als de gebruiker de app geïnstalleerd heeft en URL schemes ondersteund zijn.
-                // Anders opent het netjes in de webbrowser op gemini.google.com
-                window.open(`https://gemini.google.com/app?q=${encodedPrompt}`, '_blank');
-
                 hideStatus();
             }, 1000);
         }
