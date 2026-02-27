@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,121 +11,197 @@
     <link rel="manifest" href="manifest.json">
     <title>Dicteer App</title>
     <style>
+        :root {
+            /* Light theme variables */
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --container-bg: #ffffff;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --btn-primary: #007aff;
+            /* iOS Blue */
+            --btn-primary-hover: #0056b3;
+            --btn-secondary: #f2f2f7;
+            /* iOS Gray */
+            --btn-secondary-hover: #e5e5ea;
+            --border-color: #e5e5ea;
+            --panel-bg: #f8f9fa;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Dark theme variables */
+                --bg-gradient-start: #1a1a2e;
+                --bg-gradient-end: #16213e;
+                --container-bg: #1c1c1e;
+                /* iOS Dark Gray */
+                --text-main: #ffffff;
+                --text-sub: #ebebf599;
+                /* iOS Dark Subtext */
+                --btn-primary: #0a84ff;
+                /* iOS Dark Blue */
+                --btn-primary-hover: #006ee6;
+                --btn-secondary: #2c2c2e;
+                --btn-secondary-hover: #3a3a3c;
+                --border-color: #38383a;
+                --panel-bg: #2c2c2e;
+            }
+
+            textarea,
+            select {
+                background-color: #1c1c1e;
+                color: #ffffff;
+            }
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            /* Remove tap highlight on iOS */
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
+            background: var(--container-bg);
+            border-radius: 24px;
+            /* More rounded for iOS */
+            padding: 30px 24px;
             max-width: 700px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            /* Better padding on mobile */
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
+
         h1 {
-            color: #333;
-            margin-bottom: 10px;
+            color: var(--text-main);
+            margin-bottom: 8px;
             font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
-        
+
         .subtitle {
-            color: #666;
+            color: var(--text-sub);
             margin-bottom: 30px;
             font-size: 14px;
         }
-        
+
         .controls {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        
+
         button {
-            padding: 12px 24px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
+            /* iOS style buttons */
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
             font-weight: 600;
         }
-        
+
         #startBtn {
-            background: #667eea;
+            background: var(--btn-primary);
             color: white;
             flex: 1;
             min-width: 150px;
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
         }
-        
+
         #startBtn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
+            background: var(--btn-primary-hover);
+            transform: scale(0.98);
         }
-        
+
         #startBtn.listening {
-            background: #e74c3c;
-            animation: pulse 1.5s infinite;
+            background: #ff3b30;
+            /* iOS Red */
+            box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7);
+            animation: pulse-ring 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 59, 48, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+            }
         }
-        
-        #clearBtn, #copyBtn {
-            background: #ecf0f1;
-            color: #333;
+
+        #clearBtn,
+        #copyBtn {
+            background: var(--btn-secondary);
+            color: var(--text-main);
         }
-        
-        #clearBtn:hover, #copyBtn:hover {
-            background: #d5dbdb;
+
+        #clearBtn:hover,
+        #copyBtn:hover {
+            background: var(--btn-secondary-hover);
+            transform: scale(0.98);
         }
-        
+
         .language-selector {
             margin-bottom: 20px;
         }
-        
+
         select {
-            padding: 10px;
-            border-radius: 8px;
-            border: 2px solid #ecf0f1;
-            font-size: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
             width: 100%;
             max-width: 200px;
+            background-color: var(--container-bg);
+            color: var(--text-main);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
         }
-        
+
         textarea {
             width: 100%;
             min-height: 250px;
-            padding: 15px;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            font-size: 17px;
             resize: vertical;
             font-family: inherit;
-            line-height: 1.6;
+            line-height: 1.5;
+            background-color: var(--container-bg);
+            color: var(--text-main);
+            transition: border-color 0.2s;
         }
-        
+
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--btn-primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
-        
+
         .status {
             margin-top: 15px;
             padding: 10px;
@@ -132,86 +209,87 @@
             font-size: 14px;
             text-align: center;
         }
-        
+
         .status.listening {
             background: #e8f5e9;
             color: #2e7d32;
         }
-        
+
         .status.error {
             background: #ffebee;
             color: #c62828;
         }
-        
+
         .status.info {
             background: #e3f2fd;
             color: #1565c0;
         }
-        
+
         .hidden {
             display: none;
         }
-        
+
         .share-controls {
             margin-bottom: 20px;
             padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
+            background: var(--panel-bg);
+            border-radius: 16px;
         }
-        
+
         .share-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
-            color: #333;
+            color: var(--text-main);
             margin-bottom: 16px;
+            letter-spacing: -0.3px;
         }
-        
+
         .share-section {
             margin-bottom: 16px;
             padding-bottom: 16px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
         }
-        
+
         .share-section:last-child {
             border-bottom: none;
             margin-bottom: 0;
             padding-bottom: 0;
         }
-        
+
         .share-subtitle {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
-            color: #555;
-            margin-bottom: 8px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
         }
-        
+
         .share-btn {
             padding: 10px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             font-weight: 600;
             margin-right: 6px;
             margin-bottom: 6px;
-            background: white;
-            color: #333;
-            border: 2px solid #e0e0e0;
+            background: var(--container-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
         }
-        
+
         .share-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #667eea;
+            transform: scale(0.98);
+            border-color: var(--btn-primary);
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🎤 Dicteer App</h1>
         <p class="subtitle">Spreek duidelijk in je microfoon</p>
-        
+
         <div class="language-selector">
             <label for="language">Taal:</label>
             <select id="language">
@@ -223,13 +301,13 @@
                 <option value="es-ES">Spaans</option>
             </select>
         </div>
-        
+
         <div class="controls">
             <button id="startBtn">Start Opname</button>
             <button id="clearBtn">Wissen</button>
             <button id="copyBtn">Kopiëren</button>
         </div>
-        
+
         <div class="share-controls">
             <p class="share-title">Delen met Gemini:</p>
             <div class="share-section">
@@ -242,17 +320,10 @@
                 <button id="newTaskBtn" class="share-btn">Nieuwe taak</button>
                 <button id="editTaskBtn" class="share-btn">Taak wijzigen</button>
             </div>
-            <div class="share-section">
-                <p class="share-subtitle">📝 Google Keep</p>
-                <button id="newNoteBtn" class="share-btn">Nieuwe notitie</button>
-                <button id="editNoteBtn" class="share-btn">Notitie aanvullen</button>
-                <button id="newListBtn" class="share-btn">Lijstje maken</button>
-                <button id="editListBtn" class="share-btn">Lijstje aanvullen</button>
-            </div>
         </div>
-        
+
         <textarea id="textArea" placeholder="Je getypte tekst verschijnt hier..."></textarea>
-        
+
         <div id="status" class="status hidden"></div>
     </div>
 
@@ -264,16 +335,36 @@
         const editCalendarBtn = document.getElementById('editCalendarBtn');
         const newTaskBtn = document.getElementById('newTaskBtn');
         const editTaskBtn = document.getElementById('editTaskBtn');
-        const newNoteBtn = document.getElementById('newNoteBtn');
-        const editNoteBtn = document.getElementById('editNoteBtn');
-        const newListBtn = document.getElementById('newListBtn');
-        const editListBtn = document.getElementById('editListBtn');
         const textArea = document.getElementById('textArea');
         const statusDiv = document.getElementById('status');
         const languageSelect = document.getElementById('language');
-        
+
         let recognition;
         let isListening = false;
+        let wakeLock = null;
+
+        // Functie om Wake Lock aan te vragen (scherm aan houden)
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock is active');
+                }
+            } catch (err) {
+                console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+            }
+        }
+
+        // Functie om Wake Lock vrij te geven
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release()
+                    .then(() => {
+                        wakeLock = null;
+                        console.log('Wake Lock released');
+                    });
+            }
+        }
 
         // Check of browser spraakherkenning ondersteunt
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -283,13 +374,13 @@
             // Initialiseer spraakherkenning
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-            
+
             recognition.continuous = true;
             recognition.interimResults = true;
             recognition.lang = languageSelect.value;
-            
+
             let lastSegmentTime = Date.now();
-            
+
             // Update taal bij wijziging 
             languageSelect.addEventListener('change', () => {
                 recognition.lang = languageSelect.value;
@@ -298,11 +389,11 @@
                     setTimeout(() => recognition.start(), 100);
                 }
             });
-            
+
             recognition.onresult = (event) => {
                 let interimTranscript = '';
                 let finalTranscript = '';
-                
+
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const transcript = event.results[i][0].transcript;
                     if (event.results[i].isFinal) {
@@ -311,21 +402,21 @@
                         interimTranscript += transcript;
                     }
                 }
-                
+
                 if (finalTranscript) {
                     const now = Date.now();
                     const timeSinceLastSegment = now - lastSegmentTime;
                     lastSegmentTime = now;
-                    
+
                     // Voeg leestekens toe
                     let processed = finalTranscript.trim();
-                    
+
                     // Maak eerste letter hoofdletter als tekstveld leeg is of na punt
                     const currentText = textArea.value.trim();
                     if (currentText === '' || currentText.endsWith('.') || currentText.endsWith('?') || currentText.endsWith('!')) {
                         processed = processed.charAt(0).toUpperCase() + processed.slice(1);
                     }
-                    
+
                     // Voeg punt toe aan het einde als er een pauze van meer dan 2 seconden was
                     if (timeSinceLastSegment > 2000 && currentText !== '') {
                         // Voeg punt toe aan vorige tekst als die nog geen leesteken heeft
@@ -335,23 +426,31 @@
                         }
                         processed = processed.charAt(0).toUpperCase() + processed.slice(1);
                     }
-                    
+
                     textArea.value += processed + ' ';
                 }
             };
-            
+
             recognition.onstart = () => {
                 isListening = true;
                 startBtn.textContent = 'Stop Opname';
                 startBtn.classList.add('listening');
                 showStatus('Luisteren... Spreek nu!', 'listening');
+
+                // Haptische feedback als beschikbaar
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+
+                requestWakeLock();
             };
-            
+
             recognition.onend = () => {
                 isListening = false;
                 startBtn.textContent = 'Start Opname';
                 startBtn.classList.remove('listening');
-                
+                releaseWakeLock();
+
                 // Voeg punt toe aan het einde als tekst niet eindigt met leesteken
                 const text = textArea.value.trim();
                 if (text !== '') {
@@ -362,12 +461,12 @@
                         textArea.value = text + '\n\n';
                     }
                 }
-                
+
                 if (statusDiv.textContent.includes('Luisteren')) {
                     hideStatus();
                 }
             };
-            
+
             recognition.onerror = (event) => {
                 if (event.error === 'no-speech') {
                     showStatus('Geen spraak gedetecteerd. Probeer het opnieuw.', 'error');
@@ -378,114 +477,104 @@
                 }
             };
         }
-        
+
+        // Luister naar visibility change om wake lock te herstellen als app terugkomt
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible' && isListening) {
+                requestWakeLock();
+            }
+        });
+
         startBtn.addEventListener('click', () => {
             if (!recognition) return;
-            
+
             if (isListening) {
                 recognition.stop();
             } else {
                 recognition.start();
             }
         });
-        
+
         clearBtn.addEventListener('click', () => {
             textArea.value = '';
             showStatus('Tekst gewist', 'info');
             setTimeout(hideStatus, 2000);
         });
-        
+
         copyBtn.addEventListener('click', () => {
             textArea.select();
             document.execCommand('copy');
             showStatus('Tekst gekopieerd naar klembord!', 'info');
             setTimeout(hideStatus, 2000);
         });
-        
+
         // Functie om te delen met Gemini prompt
         async function shareWithGemini(actionType) {
             const text = textArea.value.trim();
-            
+
             if (!text) {
                 showStatus('Geen tekst om te delen', 'error');
                 setTimeout(hideStatus, 2000);
                 return;
             }
-            
+
             let prompt = '';
-            
+
             // Google Calendar prompts
             if (actionType === 'newCalendar') {
                 prompt = `Hi Gemini, ik wil een nieuwe afspraak maken in mijn Google Agenda: ${text}`;
             } else if (actionType === 'editCalendar') {
                 prompt = `Hi Gemini, ik wil een bestaande afspraak wijzigen in mijn Google Agenda: ${text}`;
             }
-            
+
             // Google Tasks prompts
             else if (actionType === 'newTask') {
                 prompt = `Hi Gemini, ik wil een nieuwe taak aanmaken in mijn Google Tasks: ${text}`;
             } else if (actionType === 'editTask') {
                 prompt = `Hi Gemini, ik wil iets toevoegen aan een bestaande taak, de bestaande info moet in de taak blijven staan in mijn Google Tasks: ${text}`;
             }
-            
-            // Google Keep prompts
-            else if (actionType === 'newNote') {
-                prompt = `Hi Gemini, ik wil een nieuwe notitie maken in mijn Google Keep, bedenk zelf maar een titel, de inhoud van de notitie is: ${text}`;
-            } else if (actionType === 'editNote') {
-                prompt = `Hi Gemini, ik wil een bestaande notitie aanvullen in mijn Google Keep: ${text}`;
-            } else if (actionType === 'newList') {
-                prompt = `Hi Gemini, ik wil een nieuwe lijst maken in mijn Google Keep: ${text}`;
-            } else if (actionType === 'editList') {
-                prompt = `Hi Gemini, ik wil een item toevoegen aan een bestaande lijst in mijn Google Keep: ${text}`;
+
+
+            // Kopieer de prompt eerst naar het klembord voor de zekerheid
+            try {
+                await navigator.clipboard.writeText(prompt);
+                showStatus('Prompt gekopieerd! Gemini wordt geopend...', 'info');
+            } catch (err) {
+                console.error('Kon niet kopiëren naar klembord', err);
+                showStatus('Gemini wordt geopend...', 'info');
             }
-            
-            // Check of browser Web Share API ondersteunt
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Voor Gemini',
-                        text: prompt
-                    });
-                    showStatus('Gedeeld! Kies Gemini uit het menu', 'info');
-                    setTimeout(hideStatus, 3000);
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        // Fallback: kopieer naar klembord
-                        navigator.clipboard.writeText(prompt).then(() => {
-                            showStatus('Prompt gekopieerd! Plak in Gemini', 'info');
-                            setTimeout(hideStatus, 3000);
-                        });
-                    }
-                }
-            } else {
-                // Fallback voor browsers zonder share API
-                navigator.clipboard.writeText(prompt).then(() => {
-                    showStatus('Prompt gekopieerd! Plak in Gemini', 'info');
-                    setTimeout(hideStatus, 3000);
-                });
-            }
+
+            // Wacht even zodat gebruiker de status kan lezen
+            setTimeout(() => {
+                // Encode de prompt voor de URL
+                const encodedPrompt = encodeURIComponent(prompt);
+
+                // Open de Gemini URL. 
+                // Op iOS (mobiel) zal Safari vaak vragen "Openen in Gemini?" of direct de app openen
+                // als de gebruiker de app geïnstalleerd heeft en URL schemes ondersteund zijn.
+                // Anders opent het netjes in de webbrowser op gemini.google.com
+                window.open(`https://gemini.google.com/app?q=${encodedPrompt}`, '_blank');
+
+                hideStatus();
+            }, 1000);
         }
-        
+
         function showStatus(message, type) {
             statusDiv.textContent = message;
             statusDiv.className = 'status ' + type;
             statusDiv.classList.remove('hidden');
         }
-        
+
         function hideStatus() {
             statusDiv.classList.add('hidden');
         }
-        
+
         // Event listeners voor alle knoppen
         newCalendarBtn.addEventListener('click', () => shareWithGemini('newCalendar'));
         editCalendarBtn.addEventListener('click', () => shareWithGemini('editCalendar'));
         newTaskBtn.addEventListener('click', () => shareWithGemini('newTask'));
         editTaskBtn.addEventListener('click', () => shareWithGemini('editTask'));
-        newNoteBtn.addEventListener('click', () => shareWithGemini('newNote'));
-        editNoteBtn.addEventListener('click', () => shareWithGemini('editNote'));
-        newListBtn.addEventListener('click', () => shareWithGemini('newList'));
-        editListBtn.addEventListener('click', () => shareWithGemini('editList'));
-        
+
         // Service Worker registratie voor PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -496,4 +585,5 @@
         }
     </script>
 </body>
+
 </html>
