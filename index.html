@@ -461,7 +461,7 @@
 
         // Check of browser spraakherkenning ondersteunt
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            showStatus('Je browser ondersteunt geen spraakherkenning. Probeer Chrome of Edge.', 'error');
+            showStatus('Spraakherkenning vereist een veilige (HTTPS) verbinding, of wordt niet ondersteund door je browser.', 'error');
             startBtn.disabled = true;
         } else {
             // Initialiseer spraakherkenning
@@ -687,9 +687,20 @@
         });
 
         copyBtn.addEventListener('click', () => {
+            const textToCopy = textArea.value;
+            if (!textToCopy.trim()) {
+                showStatus('Niets om te kopiëren', 'error');
+                setTimeout(hideStatus, 2000);
+                return;
+            }
+
             textArea.select();
             document.execCommand('copy');
-            showStatus('Tekst gekopieerd naar klembord!', 'info');
+
+            // Leeg het veld na kopiëren
+            textArea.value = '';
+
+            showStatus('Tekst gekopieerd & veld leeggemaakt!', 'info');
             setTimeout(hideStatus, 2000);
         });
 
@@ -731,11 +742,25 @@
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            // Probeer op iOS specifiek de Google Gemini app (of de Google app) te openen via een custom URL scheme
+            // Probeer op iOS specifiek de Google (Gemini) app te openen via een custom URL scheme
             if (isIOS) {
-                // We sturen de gebruiker naar de web URL, iOS Safari zal vaak zelf
-                // voorstellen om dit in de app te openen als deze geïnstalleerd is.
-                window.location.href = "https://gemini.google.com/app";
+                // De URL scheme googleapp:// forceert iOS om te checken of de Google App
+                // geïnstalleerd is en deze te openen. Als dit faalt (app niet aanwezig), 
+                // doet iOS helaas vaak niets. Daarom bieden we na een korte timeout een fallback
+                // naar de browser (we gaan er vanuit dat de app instant opent en het script pauzeert).
+
+                const appUrl = "googleapp://";
+                const webUrl = "https://gemini.google.com/app";
+
+                // Probeer de app te openen
+                window.location.href = appUrl;
+
+                // Fallback instellen: Als de app na 1.5s niet is geopend (en de pagina 
+                // dus nog actief is doordat window.location faalde), open dan de webversie
+                setTimeout(function () {
+                    window.location.href = webUrl;
+                }, 1500);
+
             } else if (isMobile) {
                 // Android/andere mobiele apparaten
                 window.location.href = "https://gemini.google.com/app";
