@@ -744,22 +744,41 @@
 
             // Probeer op iOS specifiek de Google (Gemini) app te openen via een custom URL scheme
             if (isIOS) {
-                // De URL scheme googleapp:// forceert iOS om te checken of de Google App
-                // geïnstalleerd is en deze te openen. Als dit faalt (app niet aanwezig), 
-                // doet iOS helaas vaak niets. Daarom bieden we na een korte timeout een fallback
-                // naar de browser (we gaan er vanuit dat de app instant opent en het script pauzeert).
-
                 const appUrl = "googleapp://";
                 const webUrl = "https://gemini.google.com/app";
 
-                // Probeer de app te openen
-                window.location.href = appUrl;
+                // Om de vervelende melding "Safari kan de pagina niet openen omdat het 
+                // adres ongeldig is" te voorkomen (als de app niet/verkeerd geïnstalleerd is),
+                // injecteren we de link onzichtbaar in een iframe.
 
-                // Fallback instellen: Als de app na 1.5s niet is geopend (en de pagina 
-                // dus nog actief is doordat window.location faalde), open dan de webversie
-                setTimeout(function () {
+                let fallbackTriggered = false;
+
+                // Fallback mechanisme: Als de app niet opstart binnen 1.5s, ga naar web
+                const fallbackTimer = setTimeout(function () {
+                    fallbackTriggered = true;
                     window.location.href = webUrl;
                 }, 1500);
+
+                // Verborgen iframe maken
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = appUrl;
+
+                // Zodra het iframe is geladen, gaan we ervan uit dat het URL scheme 
+                // succesvol is afgevangen door iOS als we niet al in navigeren zijn.
+                iframe.onload = function () {
+                    // Mocht de app wel laden en de browser op de achtergrond open blijven
+                    clearTimeout(fallbackTimer);
+                };
+
+                document.body.appendChild(iframe);
+
+                // Opruimen iframe
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 2000);
 
             } else if (isMobile) {
                 // Android/andere mobiele apparaten
