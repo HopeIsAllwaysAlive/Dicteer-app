@@ -544,24 +544,27 @@
                 showStatus('Gemini wordt geopend...', 'info');
             }
 
-            // Open direct of in een tabblad, AFHANKELIJK van het device.
-            // Op mobiel (iOS Safari) blokkeert een setTimeout vaak window.open (popup blocker).
-            // Daarom openen we de URL direct, en laten we de status timeout daarna pas afronden.
-            const encodedPrompt = encodeURIComponent(prompt);
-            const geminiUrl = `https://gemini.google.com/app?q=${encodedPrompt}`;
+            // Opmerking: Gemini web ondersteunt momenteel geen officiële URL parameter (zoals ?q=) 
+            // om de zoekbalk direct in te vullen. De enige betrouwbare manier is dat de tekst
+            // al op het klembord staat, zodat de gebruiker het alleen hoeft te plakken.
 
-            // Check of het een mobiel apparaat is (simpele check)
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            if (isMobile) {
-                // Op mobiel: navigeer direct in hetzelfde tabblad. Voorkomt popup blockers en dwingt iOS om te vragen of de app open moet.
-                window.location.href = geminiUrl;
+            // Probeer op iOS specifiek de Google Gemini app (of de Google app) te openen via een custom URL scheme
+            if (isIOS) {
+                // We sturen de gebruiker naar de web URL, iOS Safari zal vaak zelf
+                // voorstellen om dit in de app te openen als deze geïnstalleerd is.
+                window.location.href = "https://gemini.google.com/app";
+            } else if (isMobile) {
+                // Android/andere mobiele apparaten
+                window.location.href = "https://gemini.google.com/app";
             } else {
                 // Op desktop: open netjes in een nieuw tabblad
-                window.open(geminiUrl, '_blank');
+                window.open("https://gemini.google.com/app", '_blank');
             }
 
-            // Wacht even zodat gebruiker de status in theorie nog kan lezen (op desktop)
+            // Wacht even zodat gebruiker de status in theorie nog kan lezen
             setTimeout(() => {
                 hideStatus();
             }, 1000);
