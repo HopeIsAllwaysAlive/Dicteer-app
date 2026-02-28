@@ -229,58 +229,148 @@
             display: none;
         }
 
-        .share-controls {
-            margin-bottom: 20px;
-            padding: 20px;
-            background: var(--panel-bg);
-            border-radius: 16px;
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
-        .share-title {
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 16px;
-            letter-spacing: -0.3px;
-        }
-
-        .share-section {
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .share-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .share-subtitle {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-sub);
-            margin-bottom: 10px;
-        }
-
-        .share-btn {
-            padding: 10px 16px;
+        .action-btn {
+            flex: 1;
+            padding: 14px 16px;
             border: none;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
-            margin-right: 6px;
-            margin-bottom: 6px;
             background: var(--container-bg);
             color: var(--text-main);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
+            min-width: calc(50% - 5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
 
-        .share-btn:hover {
+        .action-btn.primary {
+            background: var(--btn-secondary);
+            border-color: var(--btn-secondary);
+        }
+
+        .action-btn.danger {
+            color: #ff3b30;
+            border-color: #ff3b30;
+            background: transparent;
+        }
+
+        .action-btn:hover {
             transform: scale(0.98);
             border-color: var(--btn-primary);
+        }
+
+        .action-btn.danger:hover {
+            background: #ffebee;
+            border-color: #ff3b30;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .action-btn.danger:hover {
+                background: rgba(255, 59, 48, 0.1);
+            }
+        }
+
+        /* Historie sectie */
+        .history-section {
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .history-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clear-history-btn {
+            background: transparent;
+            border: none;
+            color: #ff3b30;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .clear-history-btn:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 14px 16px;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover {
+            background: var(--btn-secondary);
+            border-color: var(--border-color);
+            transform: translateY(-1px);
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .history-preview {
+            font-size: 14px;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 14px;
+            padding: 20px 0;
+            font-style: italic;
+        }
+
+        /* Custom scrollbar for history */
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -303,28 +393,29 @@
         </div>
 
         <div class="controls">
-            <button id="startBtn">Start Opname</button>
-            <button id="clearBtn">Wissen</button>
-            <button id="copyBtn">Kopiëren</button>
-        </div>
-
-        <div class="share-controls">
-            <p class="share-title">Delen met Gemini:</p>
-            <div class="share-section">
-                <p class="share-subtitle">📅 Google Agenda</p>
-                <button id="newCalendarBtn" class="share-btn">Nieuwe afspraak</button>
-                <button id="editCalendarBtn" class="share-btn">Afspraak wijzigen</button>
-            </div>
-            <div class="share-section">
-                <p class="share-subtitle">✅ Google Tasks</p>
-                <button id="newTaskBtn" class="share-btn">Nieuwe taak</button>
-                <button id="editTaskBtn" class="share-btn">Taak wijzigen</button>
-            </div>
+            <button id="startBtn">🎤 Start Opname</button>
         </div>
 
         <textarea id="textArea" placeholder="Je getypte tekst verschijnt hier..."></textarea>
 
         <div id="status" class="status hidden"></div>
+
+        <div class="action-row">
+            <button id="copyBtn" class="action-btn primary">📋 Kopiëren</button>
+            <button id="newCalendarBtn" class="action-btn">📅 Afspraak</button>
+            <button id="newTaskBtn" class="action-btn">✅ Taak</button>
+            <button id="clearBtn" class="action-btn danger">🗑️ Wissen</button>
+        </div>
+
+        <div class="history-section">
+            <div class="history-title">
+                Historie
+                <button id="clearHistoryBtn" class="clear-history-btn hidden">Wis Alles</button>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- Historie items komen hier -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -332,16 +423,18 @@
         const clearBtn = document.getElementById('clearBtn');
         const copyBtn = document.getElementById('copyBtn');
         const newCalendarBtn = document.getElementById('newCalendarBtn');
-        const editCalendarBtn = document.getElementById('editCalendarBtn');
         const newTaskBtn = document.getElementById('newTaskBtn');
-        const editTaskBtn = document.getElementById('editTaskBtn');
         const textArea = document.getElementById('textArea');
         const statusDiv = document.getElementById('status');
         const languageSelect = document.getElementById('language');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
         let recognition;
         let isListening = false;
         let wakeLock = null;
+        let currentDictationText = ''; // Houdt tekst van huidige sessie bij om op te slaan in historie
+        let historyArray = JSON.parse(localStorage.getItem('dicteerHistory')) || [];
 
         // Functie om Wake Lock aan te vragen (scherm aan houden)
         async function requestWakeLock() {
@@ -433,33 +526,45 @@
 
             recognition.onstart = () => {
                 isListening = true;
-                startBtn.textContent = 'Stop Opname';
+                startBtn.innerHTML = '⏹️ Stop Opname';
                 startBtn.classList.add('listening');
                 showStatus('Luisteren... Spreek nu!', 'listening');
 
                 // Haptische feedback als beschikbaar
                 if (navigator.vibrate) {
-                    navigator.vibrate(50);
+                    try {
+                        navigator.vibrate(50);
+                    } catch (e) { }
                 }
+
+                currentDictationText = ''; // Reset the session text when starting
 
                 requestWakeLock();
             };
 
             recognition.onend = () => {
                 isListening = false;
-                startBtn.textContent = 'Start Opname';
+                startBtn.innerHTML = '🎤 Start Opname';
                 startBtn.classList.remove('listening');
                 releaseWakeLock();
 
                 // Voeg punt toe aan het einde als tekst niet eindigt met leesteken
                 const text = textArea.value.trim();
+                let newAddition = text;
+
                 if (text !== '') {
                     const lastChar = text.slice(-1);
                     if (lastChar !== '.' && lastChar !== '?' && lastChar !== '!' && lastChar !== ',') {
                         textArea.value = text + '.\n\n';
+                        newAddition = text + '.';
                     } else {
                         textArea.value = text + '\n\n';
                     }
+                }
+
+                // Sla de nieuwste zin/blok op in history (als het niet leeg is en niet alleen uit spaties bestaat)
+                if (newAddition && newAddition.trim().length > 3) {
+                    saveToHistory(newAddition.trim());
                 }
 
                 if (statusDiv.textContent.includes('Luisteren')) {
@@ -471,12 +576,92 @@
                 if (event.error === 'no-speech') {
                     showStatus('Geen spraak gedetecteerd. Probeer het opnieuw.', 'error');
                 } else if (event.error === 'not-allowed') {
-                    showStatus('Microfoon toegang geweigerd. Geef toestemming in je browser.', 'error');
+                    showStatus('Microfoon toegang geweigerd. Zorg dat je website (via safari instellingen) toestemming hebt gegeven.', 'error');
                 } else {
                     showStatus('Fout: ' + event.error, 'error');
                 }
             };
         }
+
+        // --- Historie Functies ---
+        function saveToHistory(text) {
+            // Voeg toe aan begin van array
+            const record = {
+                id: Date.now(),
+                text: text,
+                date: new Date().toISOString()
+            };
+
+            historyArray.unshift(record);
+
+            // Beperk tot laatste 20 items om opslag niet te vol te maken
+            if (historyArray.length > 20) {
+                historyArray = historyArray.slice(0, 20);
+            }
+
+            localStorage.setItem('dicteerHistory', JSON.stringify(historyArray));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+
+            if (historyArray.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">Nog geen historie beschikbaar. Jouw gedicteerde teksten verschijnen hier.</div>';
+                clearHistoryBtn.classList.add('hidden');
+                return;
+            }
+
+            clearHistoryBtn.classList.remove('hidden');
+
+            historyArray.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+
+                // Formatteer datum netjes
+                const dateObj = new Date(item.date);
+                const isToday = new Date().toDateString() === dateObj.toDateString();
+                const dateStr = isToday
+                    ? `Vandaag, ${dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}`
+                    : dateObj.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+                // Pak alleen de eerste zin voor preview
+                let previewText = item.text;
+                const firstSentenceEnd = item.text.indexOf('.');
+                if (firstSentenceEnd !== -1 && firstSentenceEnd < 60) {
+                    previewText = item.text.substring(0, firstSentenceEnd + 1);
+                } else if (item.text.length > 60) {
+                    previewText = item.text.substring(0, 60) + '...';
+                }
+
+                div.innerHTML = `
+                    <div class="history-date">${dateStr}</div>
+                    <div class="history-preview">"${previewText}"</div>
+                `;
+
+                div.addEventListener('click', () => {
+                    textArea.value = item.text + '\n\n';
+                    showStatus('Tekst geladen uit historie', 'info');
+                    setTimeout(hideStatus, 2000);
+                    // Scroll netjes naar boven
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+
+                historyList.appendChild(div);
+            });
+        }
+
+        // Initieer historie bij laden
+        renderHistory();
+
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Weet je zeker dat je de hele historie wilt wissen?')) {
+                historyArray = [];
+                localStorage.removeItem('dicteerHistory');
+                renderHistory();
+            }
+        });
+        // --- Einde Historie Functies ---
 
         // Luister naar visibility change om wake lock te herstellen als app terugkomt
         document.addEventListener('visibilitychange', async () => {
@@ -523,15 +708,10 @@
             // Google Calendar prompts
             if (actionType === 'newCalendar') {
                 prompt = `Hi Gemini, ik wil een nieuwe afspraak maken in mijn Google Agenda: ${text}`;
-            } else if (actionType === 'editCalendar') {
-                prompt = `Hi Gemini, ik wil een bestaande afspraak wijzigen in mijn Google Agenda: ${text}`;
             }
-
             // Google Tasks prompts
             else if (actionType === 'newTask') {
                 prompt = `Hi Gemini, ik wil een nieuwe taak aanmaken in mijn Google Tasks: ${text}`;
-            } else if (actionType === 'editTask') {
-                prompt = `Hi Gemini, ik wil iets toevoegen aan een bestaande taak, de bestaande info moet in de taak blijven staan in mijn Google Tasks: ${text}`;
             }
 
 
@@ -564,6 +744,9 @@
                 window.open("https://gemini.google.com/app", '_blank');
             }
 
+            // Leeg het tekstveld nadat we de prompt succesvol aan het klembord hebben gegeven of verstuurd
+            textArea.value = '';
+
             // Wacht even zodat gebruiker de status in theorie nog kan lezen
             setTimeout(() => {
                 hideStatus();
@@ -582,9 +765,7 @@
 
         // Event listeners voor alle knoppen
         newCalendarBtn.addEventListener('click', () => shareWithGemini('newCalendar'));
-        editCalendarBtn.addEventListener('click', () => shareWithGemini('editCalendar'));
         newTaskBtn.addEventListener('click', () => shareWithGemini('newTask'));
-        editTaskBtn.addEventListener('click', () => shareWithGemini('editTask'));
 
         // Service Worker registratie voor PWA
         if ('serviceWorker' in navigator) {
