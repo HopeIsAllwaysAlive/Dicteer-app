@@ -1038,16 +1038,7 @@
             }
         });
 
-        shareBtn.addEventListener('click', async () => {
-            const textToShare = textArea.value.trim();
-            if (!textToShare) {
-                showStatus('Niets om te delen', 'error');
-                setTimeout(hideStatus, 2000);
-                return;
-            }
-
-            // Let op: navigator.share werkt op iOS ALLEEN via HTTPS (beveiligd). 
-            // Op een lokaal IP adres (HTTP) valt dit altijd terug naar de Kopiëren fallback.
+        async function performShare(textToShare) {
             if (navigator.share) {
                 try {
                     await navigator.share({
@@ -1072,109 +1063,49 @@
                 }
                 fallbackCopy(textToShare);
             }
-        });
-
-        function fallbackCopy(text) {
-            textArea.select();
-            document.execCommand('copy');
-            textArea.value = '';
-            updateWordCount();
-            showStatus('Gekopieerd & veld leeggemaakt!', 'info');
-            setTimeout(hideStatus, 2000);
         }
 
-        // Functie om te delen met Gemini prompt
-        async function shareWithGemini(actionType) {
-            const text = textArea.value.trim();
-
-            if (!text) {
-                showStatus('Geen tekst om te delen', 'error');
+        shareBtn.addEventListener('click', () => {
+            const textToShare = textArea.value.trim();
+            if (!textToShare) {
+                showStatus('Niets om te delen', 'error');
                 setTimeout(hideStatus, 2000);
                 return;
             }
+            performShare(textToShare);
+        });
 
-            let prompt = text;
-
-            // Google Calendar prompts
-            if (actionType === 'newCalendar') {
-                prompt = `Hi Gemini, ik wil een nieuwe afspraak maken in mijn Google Agenda: ${text}`;
-            }
-            // Google Tasks prompts
-            else if (actionType === 'newTask') {
-                prompt = `Hi Gemini, ik wil een nieuwe taak aanmaken in mijn Google Tasks: ${text}`;
-            }
-
-
-            // Kopieer de prompt eerst naar het klembord voor de zekerheid
+        function fallbackCopy(text) {
+            // Plaats de tekst (wat ook een aangevulde prompt kan zijn) in een onzichtbaar veld om te kopiëren
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = text;
+            // Verberg het veld uit beeld
+            tempTextArea.style.position = 'fixed';
+            tempTextArea.style.top = '-9999px';
+            document.body.appendChild(tempTextArea);
+            
+            tempTextArea.select();
             try {
-                await navigator.clipboard.writeText(prompt);
-                showStatus('Prompt gekopieerd! Gemini wordt geopend...', 'info');
+                document.execCommand('copy');
+                textArea.value = '';
+                updateWordCount();
+                showStatus('Gekopieerd & veld leeggemaakt!', 'info');
             } catch (err) {
-                console.error('Kon niet kopiëren naar klembord', err);
-                showStatus('Gemini wordt geopend...', 'info');
+                console.error('Kopieer fallback faalde', err);
+                showStatus('Fout bij kopiëren', 'error');
             }
+            
+            document.body.removeChild(tempTextArea);
+            setTimeout(hideStatus, 2000);
+        }
 
-            // Opmerking: Gemini web ondersteunt momenteel geen officiële URL parameter (zoals ?q=) 
-            // om de zoekbalk direct in te vullen. De enige betrouwbare manier is dat de tekst
-            // al op het klembord staat, zodat de gebruiker het alleen hoeft te plakken.
-
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-            // Probeer op iOS specifiek de Google (Gemini) app te openen via een custom URL scheme
-            if (isIOS) {
-                const appUrl = "googleapp://";
-                const webUrl = "https://gemini.google.com/app";
-
-                // Om de vervelende melding "Safari kan de pagina niet openen omdat het 
-                // adres ongeldig is" te voorkomen (als de app niet/verkeerd geïnstalleerd is),
-                // injecteren we de link onzichtbaar in een iframe.
-
-                let fallbackTriggered = false;
-
-                // Fallback mechanisme: Als de app niet opstart binnen 1.5s, ga naar web
-                const fallbackTimer = setTimeout(function () {
-                    fallbackTriggered = true;
-                    window.location.href = webUrl;
-                }, 1500);
-
-                // Verborgen iframe maken
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = appUrl;
-
-                // Zodra het iframe is geladen, gaan we ervan uit dat het URL scheme 
-                // succesvol is afgevangen door iOS als we niet al in navigeren zijn.
-                iframe.onload = function () {
-                    // Mocht de app wel laden en de browser op de achtergrond open blijven
-                    clearTimeout(fallbackTimer);
-                };
-
-                document.body.appendChild(iframe);
-
-                // Opruimen iframe
-                setTimeout(() => {
-                    if (document.body.contains(iframe)) {
-                        document.body.removeChild(iframe);
-                    }
-                }, 2000);
-
-            } else if (isMobile) {
-                // Android/andere mobiele apparaten
-                window.location.href = "https://gemini.google.com/app";
-            } else {
-                // Op desktop: open netjes in een nieuw tabblad
-                window.open("https://gemini.google.com/app", '_blank');
+        function getActionPrompt(actionType, text) {
+            if (actionType === 'newCalendar') {
+                return `Hi Gemini, ik wil een nieuwe afspraak maken in mijn Google Agenda: ${text}`;
+            } else if (actionType === 'newTask') {
+                return `Hi Gemini, ik wil een nieuwe taak aanmaken in mijn Google Tasks: ${text}`;
             }
-
-            // Leeg het tekstveld nadat we de prompt succesvol aan het klembord hebben gegeven of verstuurd
-            textArea.value = '';
-            updateWordCount();
-
-            // Wacht even zodat gebruiker de status in theorie nog kan lezen
-            setTimeout(() => {
-                hideStatus();
-            }, 1000);
+            return text;
         }
 
         function showStatus(message, type) {
@@ -1188,8 +1119,25 @@
         }
 
         // Event listeners voor alle knoppen
-        newCalendarBtn.addEventListener('click', () => shareWithGemini('newCalendar'));
-        newTaskBtn.addEventListener('click', () => shareWithGemini('newTask'));
+        newCalendarBtn.addEventListener('click', () => {
+            const text = textArea.value.trim();
+            if (!text) {
+                showStatus('Geen tekst voor afspraak', 'error');
+                setTimeout(hideStatus, 2000);
+                return;
+            }
+            performShare(getActionPrompt('newCalendar', text));
+        });
+
+        newTaskBtn.addEventListener('click', () => {
+            const text = textArea.value.trim();
+            if (!text) {
+                showStatus('Geen tekst voor taak', 'error');
+                setTimeout(hideStatus, 2000);
+                return;
+            }
+            performShare(getActionPrompt('newTask', text));
+        });
 
         // Service Worker registratie voor PWA
         if ('serviceWorker' in navigator) {
